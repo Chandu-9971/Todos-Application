@@ -1,0 +1,44 @@
+GET http://localhost:3000/todos/?status=TO%20DO
+
+###
+
+GET http://localhost:3000/todos/1/
+
+###
+
+GET http:/localhost:3000/todos/agenda/
+
+###
+
+POST http://localhost:3000/todos/ 
+
+{
+ "id": 6,
+ "todo": "Finalize event theme",
+ "priority": "LOW",
+ "status": "TO DO",
+ "category": "HOME",
+ "dueDate": "2021-02-22"
+}
+
+###
+
+PUT http://localhost:3000/todos/5/
+
+{ "status": "DONE" }
+
+{ "priority": "HIGH" }
+
+{
+"todo": "Clean the garden"
+}
+
+{ "category": "LEARNING" }
+
+{ "dueDate": "2021-01-12" }
+
+###
+
+DELETE http://localhost:3000/3/
+
+###
