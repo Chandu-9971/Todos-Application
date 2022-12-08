@@ -2,8 +2,8 @@ const express = require("express");
 const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
 const path = require("path");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+//const bcrypt = require("bcrypt");
+//const jwt = require("jsonwebtoken");
 
 const databasePath = path.join(__dirname, "todoApplication.db");
 
@@ -86,10 +86,10 @@ const hasDueDateProperty = (requestQuery) => {
   return requestQuery.dueDate !== undefined;
 };
 
-app.get("/todos/", authenticateToken, async (request, response) => {
+app.get("/todos/", async (request, response) => {
   let data = null;
   let getTodosQuery = "";
-  const { search_q = "", priority, status } = request.query;
+  const { search_q = "", priority, status, category, due_date } = request.query;
 
   switch (true) {
     case hasPriorityAndStatusProperties(request.query):
@@ -131,7 +131,9 @@ app.get("/todos/", authenticateToken, async (request, response) => {
       break;
     case hasCategoryProperty(request.query):
       getTodosQuery = `
-              SELECT * FROM todo WHERE category = '${category}';`;
+              SELECT * FROM todo WHERE todo LIKE '%${search_q}%'
+              AND
+              category = '${category}';`;
       break;
     case hasPriorityAndCategoryProperties(request.query):
       getTodosQuery = `
@@ -154,7 +156,7 @@ app.get("/todos/", authenticateToken, async (request, response) => {
   response.send(data);
 });
 
-app.get("/todos/:todoId/", authenticateToken, async (request, response) => {
+app.get("/todos/:todoId/", async (request, response) => {
   const { todoId } = request.params;
 
   const getTodoQuery = `
@@ -168,25 +170,25 @@ app.get("/todos/:todoId/", authenticateToken, async (request, response) => {
   response.send(todo);
 });
 
-app.get("/agenda/", async (request, response) => {
+app.get("agenda", async (request, response) => {
   const date = format(new Date(2021, 1, 21), "yyyy-MM-dd");
-  const getQuery = `select * from todo where due_date=${date};`;
+  const getQuery = `select * from todo where due_date=${date - fns};`;
   const result = await database.get(getQuery);
   response.send(result);
 });
 
 app.post("/todos/", async (request, response) => {
-  const { id, todo, priority, status, category, due_date } = request.body;
+  const { id, todo, priority, status, category, dueDate } = request.body;
   const postTodoQuery = `
   INSERT INTO
     todo (id, todo, priority, status,category,due_date)
   VALUES
-    (${id}, '${todo}', '${priority}', '${status}', '${category}', '${dueDate}');`;
+    (${id}, '${todo}', '${priority}', '${status}', '${category}', '${due_date}');`;
   await database.run(postTodoQuery);
   response.send("Todo Successfully Added");
 });
 
-app.put("/todos/:todoId/", authenticateToken, async (request, response) => {
+app.put("/todos/:todoId/", async (request, response) => {
   const { todoId } = request.params;
   let updateColumn = "";
   const requestBody = request.body;
