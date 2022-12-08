@@ -82,10 +82,6 @@ const hasCategoryProperty = (requestQuery) => {
   return requestQuery.category !== undefined;
 };
 
-const hasDueDateProperty = (requestQuery) => {
-  return requestQuery.dueDate !== undefined;
-};
-
 app.get("/todos/", async (request, response) => {
   let data = null;
   let getTodosQuery = "";
